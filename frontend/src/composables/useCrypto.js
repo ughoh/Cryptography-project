@@ -20,21 +20,17 @@ export function useCrypto() {
   }
 
   const handleFileChange = (event) => {
-    console.log('Клік спрацював у JS! Подія:', event)
     if (event.target.files && event.target.files.length > 0) {
       file.value = event.target.files[0]
-      console.log('Файл додано через КЛІК:', file.value.name)
     }
   }
 
   const handleFileDrop = (event) => {
     isDragging.value = false
     error.value = ''
-    console.log('Дроп спрацював у JS! Подія:', event)
 
     if (event.dataTransfer && event.dataTransfer.files.length > 0) {
       file.value = event.dataTransfer.files[0]
-      console.log('Файл додано через ДРОП:', file.value.name)
     }
   }
 
@@ -69,7 +65,21 @@ export function useCrypto() {
       URL.revokeObjectURL(link.href)
     } catch (err) {
       console.error(err)
-      error.value = 'Error processing file.'
+
+      if (err.response) {
+        const status = err.response.status
+
+        if (status === 422) {
+          error.value = 'Password is too short (minimum 8 characters).'
+        } else if (status === 400) {
+          error.value = 'Incorrect password or the file is corrupted.'
+        } else {
+          error.value = 'Server error. Please try again later.'
+        }
+
+      } else {
+        error.value = 'Network error. Server is unreachable.'
+      }
     } finally {
       loading.value = false
     }
