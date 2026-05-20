@@ -60,7 +60,7 @@ Ensure you have the following installed on your system:
 ### 1. Backend Setup
 - **Navigate to the backend directory from the root folder**: cd backend
 - **Install all required dependencies using Poetry**: poetry install
-- **Start the local development server using Uvicorn**: poetry run uvicorn app.main:app --reload
+- **Start the local development server using Uvicorn**: uvicorn app.main:app --reload
 - **Backend server URL**: The backend server will run at http://127.0.0.1:8000.
 
 ### 2. Frontend Setup
