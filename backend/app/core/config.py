@@ -24,8 +24,8 @@ class AppSettings(BaseModel):
 
 class AppRunSettings(BaseModel):
     app: str = "app.main:app"
-    host: str = ("127.0.0.1",)
-    port: int = (8000,)
+    host: str = "127.0.0.1"
+    port: int = 8000
     reload: bool = True
 
 
