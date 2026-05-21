@@ -70,15 +70,17 @@ export function useCrypto() {
         const status = err.response.status
 
         if (status === 422) {
-          error.value = 'Password is too short (minimum 8 characters).'
+          error.value = 'Password must be at least 8 characters long and include uppercase, lowercase, numbers, and special characters.'
         } else if (status === 400) {
           error.value = 'Incorrect password or the file is corrupted.'
         } else {
           error.value = 'Server error. Please try again later.'
         }
 
-      } else {
+      } else if (err.request) {
         error.value = 'Network error. Server is unreachable.'
+      } else {
+        error.value = 'An unexpected error occurred.'
       }
     } finally {
       loading.value = false
