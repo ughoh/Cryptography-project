@@ -27,7 +27,11 @@ async def encrypt_file(
 
         encoded_filename = quote(encrypted_filename)
 
-        encrypted_data = AESEncryptor.encrypt(file_bytes, form_data.password)
+        passwords = [form_data.password]
+        if hasattr(form_data, "second_password") and form_data.second_password:
+            passwords.append(form_data.second_password)
+
+        encrypted_data = AESEncryptor.encrypt(file_bytes, passwords)
 
         return StreamingResponse(
             io.BytesIO(encrypted_data),

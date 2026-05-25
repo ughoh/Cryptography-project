@@ -56,13 +56,38 @@
         </div>
       </div>
 
+      <div class="flex items-center gap-3 p-3 bg-slate-800/30 border border-slate-800 rounded-xl">
+        <input
+          type="checkbox"
+          id="multiUserMode"
+          v-model="isMultiUser"
+          class="w-4 h-4 rounded border-slate-700 bg-slate-800 text-emerald-500 focus:ring-emerald-500/20 focus:ring-offset-slate-900 accent-emerald-500 cursor-pointer"
+        />
+        <label for="multiUserMode" class="text-sm font-medium text-slate-300 cursor-pointer select-none">
+          Enable Multi-user Mode (XOR Split)
+        </label>
+      </div>
+
       <div class="flex flex-col gap-2">
-        <label class="text-sm font-medium text-slate-300">Enter password (min. 8 characters):</label>
+        <label class="text-sm font-medium text-slate-300">
+          {{ isMultiUser ? 'First Password (min. 8 characters):' : 'Enter password (min. 8 characters):' }}
+        </label>
         <input
           type="password"
           v-model="password"
           placeholder="Enter a secure password"
           required
+          class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition"
+        />
+      </div>
+
+      <div v-if="isMultiUser" class="flex flex-col gap-2 transition duration-200">
+        <label class="text-sm font-medium text-slate-300">Second Password (min. 8 characters):</label>
+        <input
+          type="password"
+          v-model="secondPassword"
+          placeholder="Enter the second secure password"
+          :required="isMultiUser"
           class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition"
         />
       </div>
@@ -89,6 +114,6 @@ import { toRefs } from 'vue'
 import { useCrypto } from '../composables/useCrypto'
 
 const cryptoState = useCrypto()
-const { mode, password, loading, error, isDragging, file, buttonText } = toRefs(cryptoState)
+const { mode, password, secondPassword, isMultiUser, loading, error, isDragging, file, buttonText } = toRefs(cryptoState)
 const { setMode, handleFileChange, handleFileDrop, submitForm } = cryptoState
 </script>

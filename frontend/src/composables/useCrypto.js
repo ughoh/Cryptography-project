@@ -5,6 +5,8 @@ export function useCrypto() {
   const mode = ref('encrypt')
   const file = ref(null)
   const password = ref('')
+  const secondPassword = ref('')
+  const isMultiUser = ref(false)
   const loading = ref(false)
   const error = ref('')
   const isDragging = ref(false)
@@ -36,12 +38,18 @@ export function useCrypto() {
 
   const submitForm = async () => {
     if (!file.value || !password.value) return
+    if (isMultiUser.value && !secondPassword.value) return
+
     loading.value = true
     error.value = ''
 
     const formData = new FormData()
     formData.append('file', file.value)
     formData.append('password', password.value)
+
+    if (isMultiUser.value && secondPassword.value) {
+      formData.append('second_password', secondPassword.value)
+    }
 
     const endpoint = mode.value === 'encrypt' ? '/api/v1/encrypt' : '/api/v1/decrypt'
 
@@ -66,17 +74,30 @@ export function useCrypto() {
     } catch (err) {
       console.error(err)
 
-      if (err.response) {
-        const status = err.response.status
+      if (err.response && err.response.data) {
+        let errorData = err.response.data
 
-        if (status === 422) {
-          error.value = 'Password must be at least 8 characters long and include uppercase, lowercase, numbers, and special characters.'
-        } else if (status === 400) {
-          error.value = 'Incorrect password or the file is corrupted.'
-        } else {
-          error.value = 'Server error. Please try again later.'
+        if (errorData instanceof Blob) {
+          try {
+            const text = await errorData.text()
+            errorData = JSON.parse(text)
+          } catch {
+            errorData = null
+          }
         }
 
+        if (errorData && errorData.detail) {
+          error.value = errorData.detail
+        } else {
+          const status = err.response.status
+          if (status === 422) {
+            error.value = 'Password validation error. Please check requirements.'
+          } else if (status === 400) {
+            error.value = 'Incorrect password, key mismatch, or the file has been tampered with (integrity compromised).'
+          } else {
+            error.value = 'Server error. Please try again later.'
+          }
+        }
       } else if (err.request) {
         error.value = 'Network error. Server is unreachable.'
       } else {
@@ -91,6 +112,8 @@ export function useCrypto() {
     mode,
     file,
     password,
+    secondPassword,
+    isMultiUser,
     loading,
     error,
     isDragging,
